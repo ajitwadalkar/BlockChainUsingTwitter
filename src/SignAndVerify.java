@@ -1,9 +1,10 @@
 import javax.xml.bind.DatatypeConverter;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Properties;
 
 public class SignAndVerify {
     private static BigInteger primeNum =  new BigInteger("1374228530234763472016406730030809440720634793537908797");
@@ -14,32 +15,24 @@ public class SignAndVerify {
 
         String msg = "This is a test message";
         String password = "user01";
-        String[] keys;
-        keys = getKeys(password);
-        String secretKey = keys[0];
-        String publicKey = keys[1];
-        String signature =  signMsg(secretKey,msg);
+        String publicKey = getPubKey(password);
+        String signature =  signMsg(password,msg);
         System.out.println(verifySign(publicKey,signature,msg));
-        System.out.println(publicKey);
-        System.out.println(signature);
-        System.out.println(msg);
-
+        String s =  publicKey +"\n"+signature+"\n"+msg;
+        System.out.println(s);
 
     }
 
     public static String signMsg(String secretKey, String msg) throws UnsupportedEncodingException, NoSuchAlgorithmException {
-        BigInteger sk = new BigInteger(1, DatatypeConverter.parseHexBinary(secretKey));
+        BigInteger sk = getHash(secretKey);
         BigInteger hmsg = getHash(msg);
         BigInteger sign = gVal.modPow(hmsg.subtract(sk), primeNum); //g raised to (hash msg - secret key) mod p
         return DatatypeConverter.printHexBinary(sign.toByteArray());
     }
 
-    public static String[] getKeys(String secretKey) throws UnsupportedEncodingException, NoSuchAlgorithmException {
+    public static String getPubKey(String secretKey) throws UnsupportedEncodingException, NoSuchAlgorithmException {
         BigInteger sk = getHash(secretKey);
-        String[] keys = new String[2];
-        keys[0] = DatatypeConverter.printHexBinary(sk.toByteArray());
-        keys[1] = DatatypeConverter.printHexBinary(gVal.modPow(sk, primeNum).toByteArray());
-        return keys;
+        return DatatypeConverter.printHexBinary(gVal.modPow(sk, primeNum).toByteArray());
     }
 
     public static Boolean verifySign(String pubKey, String signature, String msg) throws UnsupportedEncodingException, NoSuchAlgorithmException {
@@ -58,6 +51,18 @@ public class SignAndVerify {
         BigInteger numHash = new BigInteger(1, thedigest);
         return  numHash;
     }
+/*
 
+   public static String getSignature(String user, String msg) throws IOException, NoSuchAlgorithmException {
+       Properties properties = new Properties();
+       InputStream pubKeys = null;
+       pubKeys = new FileInputStream("PublicKeys.properties");
+       properties.load(pubKeys);
+       BigInteger sk = getHash(user);
+       BigInteger hmsg = getHash(msg);
+
+       return "a";
+    }
+*/
 
 }

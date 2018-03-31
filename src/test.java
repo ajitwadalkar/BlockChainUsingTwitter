@@ -5,6 +5,8 @@ import java.security.NoSuchAlgorithmException;
 
 public class test {
     public static void main(String[] args) throws TwitterException, UnsupportedEncodingException, NoSuchAlgorithmException {
-    Users.user01Get();
+        Users.Users();
+     //Users.userPostData("user01","Another test Message");
+        Users.userGetData("user01");
     }
 }

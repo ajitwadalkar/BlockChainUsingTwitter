@@ -9,61 +9,49 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 public class Users {
-    public static void user01Post(String postStatus) throws TwitterException {
-        ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
-        configurationBuilder.setDebugEnabled(true)
-                .setOAuthConsumerKey("q6UCGb7jPJ42UoL66stP49J5X")
+    static ConfigurationBuilder user01ConfigBuilder = new ConfigurationBuilder();
+      public static void Users(){
+        user01ConfigBuilder.setDebugEnabled(true).setOAuthConsumerKey("q6UCGb7jPJ42UoL66stP49J5X")
                 .setOAuthConsumerSecret("tBk1loZDY7gZJMky0AZn3dFgpm2pN5Xr7SD84fG4iAzDqcoOpC")
                 .setOAuthAccessToken("979824715656318978-4cKvGeKwSoJO1jIc5DHygYDivsC0QEA")
                 .setOAuthAccessTokenSecret("2UGYslqJJCu4bOHxG3GjW2EsQbk9XCGKmQQpk1jgY0RVN");
-        TwitterFactory tf = new TwitterFactory(configurationBuilder.build());
-        Twitter twitter = tf.getInstance();
-        Status status = twitter.updateStatus(postStatus);
-        System.out.println("Successfully updated the status to [" + status.getText() + "].");
     }
 
-    public static void node01Post(String postStatus) throws TwitterException {
-        ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
-        configurationBuilder.setDebugEnabled(true)
-                .setOAuthConsumerKey("pBnsNT5D3UOfiL39yKAAXGsut")
-                .setOAuthConsumerSecret("OnWJkbMogI9k3rMcuLU0QRBDfbUIxGbGYXCbUEaZVthAv2JZCs")
-                .setOAuthAccessToken("979781226289647617-JaOIawxxYOBW6mz1mnbNbmpel6XnuvW")
-                .setOAuthAccessTokenSecret("tmIBP0ewSdOp5PNUDLK79KcpbemMllR9QLQ81EbppF9wT");
-        TwitterFactory tf = new TwitterFactory(configurationBuilder.build());
-        Twitter twitter = tf.getInstance();
-        Status status = twitter.updateStatus(postStatus);
-        System.out.println("Successfully updated the status to [" + status.getText() + "].");
-    }
-public static void node01Get() throws TwitterException {
-    ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
-    configurationBuilder.setDebugEnabled(true)
-            .setOAuthConsumerKey("pBnsNT5D3UOfiL39yKAAXGsut")
-            .setOAuthConsumerSecret("OnWJkbMogI9k3rMcuLU0QRBDfbUIxGbGYXCbUEaZVthAv2JZCs")
-            .setOAuthAccessToken("979781226289647617-JaOIawxxYOBW6mz1mnbNbmpel6XnuvW")
-            .setOAuthAccessTokenSecret("tmIBP0ewSdOp5PNUDLK79KcpbemMllR9QLQ81EbppF9wT");
-    TwitterFactory tf = new TwitterFactory(configurationBuilder.build());
-    Twitter twitter = tf.getInstance();
-    List<Status> statuses = twitter.getHomeTimeline();
-    System.out.println("Showing home timeline.");
-    for (Status status : statuses) {
-        System.out.println(status.getUser().getName() + ":" +
-                status.getText());
-    }
-}
-
-    public static void user01Get() throws TwitterException, UnsupportedEncodingException, NoSuchAlgorithmException {
-        ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
-        configurationBuilder.setDebugEnabled(true)
-                .setOAuthConsumerKey("q6UCGb7jPJ42UoL66stP49J5X")
-                .setOAuthConsumerSecret("tBk1loZDY7gZJMky0AZn3dFgpm2pN5Xr7SD84fG4iAzDqcoOpC")
-                .setOAuthAccessToken("979824715656318978-4cKvGeKwSoJO1jIc5DHygYDivsC0QEA")
-                .setOAuthAccessTokenSecret("2UGYslqJJCu4bOHxG3GjW2EsQbk9XCGKmQQpk1jgY0RVN");
-        TwitterFactory tf = new TwitterFactory(configurationBuilder.build());
-        Twitter twitter = tf.getInstance();
-        List<Status> statuses = twitter.getHomeTimeline();
-        for (Status status : statuses) {
-            String msg[] = status.getText().split("\\r?\\n");
-            System.out.println("Verification of message: "+msg[2]+": "+SignAndVerify.verifySign(msg[0],msg[1],msg[2]));
+    public static void userPostData(String user, String msg) throws UnsupportedEncodingException, NoSuchAlgorithmException, TwitterException {
+          TwitterFactory tf = null;
+          switch(user)
+          {
+              case "user01":
+                  tf = new TwitterFactory(user01ConfigBuilder.build());
+                  break;
+          }
+        Twitter twitter = null;
+        if (tf != null) {
+            twitter = tf.getInstance();
+            twitter.updateStatus(SignAndVerify.signMsg(user,msg)+"\n"+msg);
+            System.out.println("Message posted succesfully for "+user);
         }
     }
+
+    public static void userGetData(String user) throws UnsupportedEncodingException, NoSuchAlgorithmException, TwitterException {
+        TwitterFactory tf = null;
+        String pubKey = "";
+        switch(user)
+        {
+            case "user01":
+                tf = new TwitterFactory(user01ConfigBuilder.build());
+                pubKey = "046794F247C7D059582978BD02310243146F1D33F5E093";
+                break;
+        }
+        Twitter twitter = null;
+        if (tf != null) {
+            twitter = tf.getInstance();
+            List<Status> statuses = twitter.getHomeTimeline();
+            for (Status status : statuses) {
+                String msg[] = status.getText().split("\\r?\\n");
+                System.out.println("Verification of message: "+msg[1]+": "+SignAndVerify.verifySign(pubKey,msg[0],msg[1]));
+            }
+        }
+    }
+
 }
