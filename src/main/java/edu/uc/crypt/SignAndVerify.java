@@ -1,3 +1,5 @@
+package edu.uc.crypt;
+
 import javax.xml.bind.DatatypeConverter;
 import java.io.*;
 import java.math.BigInteger;
@@ -14,8 +16,9 @@ public class SignAndVerify {
 
 
         String msg = "This is a test message";
-        String password = "user01";
+        String password = "node01";
         String publicKey = getPubKey(password);
+        System.out.println(publicKey);
         String signature =  signMsg(password,msg);
         System.out.println(verifySign(publicKey,signature,msg));
         String s =  publicKey +"\n"+signature+"\n"+msg;
@@ -43,7 +46,6 @@ public class SignAndVerify {
         BigInteger sp = (sign.multiply(pk)).mod(primeNum);
         return gm.equals(sp);
     }
-
     public static BigInteger getHash(String msg) throws NoSuchAlgorithmException, UnsupportedEncodingException {
         byte[] bytesOfMessage = msg.getBytes("UTF-8");
         MessageDigest md = MessageDigest.getInstance("MD5");
