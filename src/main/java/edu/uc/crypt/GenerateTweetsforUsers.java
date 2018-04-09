@@ -20,7 +20,7 @@ public class GenerateTweetsforUsers {
         for (int i = 0; i < 4; i++) {
             Date date = new Date();
             String msg = "Post time is: "+dateFormat.format(date);
-            TwitterInterface.userPostData(user,msg);
+            TwitterInterface.postTweets(user,msg);
             try {
                 Thread.sleep(800);
             } catch (InterruptedException e) {

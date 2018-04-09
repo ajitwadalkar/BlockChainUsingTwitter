@@ -6,10 +6,14 @@ import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
 import twitter4j.conf.ConfigurationBuilder;
 import java.io.*;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
 class TwitterInterface {
+    //Blockchain Master config
+    private static ConfigurationBuilder masterConfigBuilder = new ConfigurationBuilder();
+
     //Users Config
     private static ConfigurationBuilder user01ConfigBuilder = new ConfigurationBuilder();
     private static ConfigurationBuilder user02ConfigBuilder = new ConfigurationBuilder();
@@ -26,6 +30,9 @@ class TwitterInterface {
     private static ConfigurationBuilder node05ConfigBuilder = new ConfigurationBuilder();
     private static ConfigurationBuilder node06ConfigBuilder = new ConfigurationBuilder();
     private static ConfigurationBuilder node07ConfigBuilder = new ConfigurationBuilder();
+
+    //TweeterFactory Master
+    private static TwitterFactory tfmaster;
 
     //TweeterFactory users
     private static TwitterFactory tfUser01;
@@ -45,6 +52,9 @@ class TwitterInterface {
     private static TwitterFactory tfnode07;
     private static String dataPropPath;
 
+    //HashMap to save blockchain tweets
+    private static HashMap<String, Integer> consensus = new HashMap<>();
+
     static void initialize(){
         dataPropPath = ValidateTweets.class.getResource("data.properties").getPath();
         setTokens();
@@ -52,6 +62,13 @@ class TwitterInterface {
     }
 
     private static void setTokens(){
+        //BlockChain Master Tokens
+        masterConfigBuilder.setDebugEnabled(true).setOAuthConsumerKey("q6UCGb7jPJ42UoL66stP49J5X")
+                .setOAuthConsumerSecret("tBk1loZDY7gZJMky0AZn3dFgpm2pN5Xr7SD84fG4iAzDqcoOpC")
+                .setOAuthAccessToken("979824715656318978-4cKvGeKwSoJO1jIc5DHygYDivsC0QEA")
+                .setOAuthAccessTokenSecret("2UGYslqJJCu4bOHxG3GjW2EsQbk9XCGKmQQpk1jgY0RVN");
+
+        //User tokens
         user01ConfigBuilder.setDebugEnabled(true).setOAuthConsumerKey("unACzlI4DYiEaqhCwolADw810")
                 .setOAuthConsumerSecret("ruMdswNC3t3M5G9zxT0TjMo502NUBUwP5BsOXZ2jkHCroA0bs8")
                 .setOAuthAccessToken("979779756597174273-ILxdR8WKzn3CiLlrmKJ1NJbULW6VrX6")
@@ -82,6 +99,7 @@ class TwitterInterface {
                 .setOAuthAccessToken("981223557500997633-3KwX049AQMLjVS44cGiAFTMFOLNJXVs")
                 .setOAuthAccessTokenSecret("TshQviM2DwzMP9EjlsD5rI9HHQiMn3XaoLSH4JFDfN9eW");
 
+        //Node tokens
         node01ConfigBuilder.setDebugEnabled(true).setOAuthConsumerKey("pBnsNT5D3UOfiL39yKAAXGsut")
                 .setOAuthConsumerSecret("OnWJkbMogI9k3rMcuLU0QRBDfbUIxGbGYXCbUEaZVthAv2JZCs")
                 .setOAuthAccessToken("979781226289647617-JaOIawxxYOBW6mz1mnbNbmpel6XnuvW")
@@ -120,6 +138,7 @@ class TwitterInterface {
 
     private static void buildTwitterFactory(){
         //TwitterFactory
+        tfmaster = new TwitterFactory(masterConfigBuilder.build());
         tfUser01 = new TwitterFactory(user01ConfigBuilder.build());
         tfUser02 = new TwitterFactory(user02ConfigBuilder.build());
         tfUser03 = new TwitterFactory(user03ConfigBuilder.build());
@@ -179,73 +198,29 @@ class TwitterInterface {
             case "user06":
                 tf = tfUser06;
                 break;
-
+            case "master":
+                tf = tfmaster;
+                break;
         }
         return tf;
     }
 
-    static void userPostData(String user, String msg){
+    static void postTweets(String user, String msg){
         TwitterFactory tf = getTFname(user);
         Twitter twitter;
         if (tf != null) {
             twitter = tf.getInstance();
             try {
-                twitter.updateStatus(SignAndVerify.signMsg(user,msg)+"\n"+msg);
+                if(user.equals("master"))
+                {
+                    twitter.updateStatus(msg);
+                }else {
+                    twitter.updateStatus(SignAndVerify.signMsg(user, msg) + "\n" + msg);
+                }
             } catch (TwitterException e) {
                 e.printStackTrace();
             }
             System.out.println("Tweet posted succesfully for "+user);
-        }
-    }
-
-    static void nodeGetData(String node){
-        TwitterFactory tf = getTFname(node);
-        Twitter twitter;
-        if (tf != null) {
-            twitter = tf.getInstance();
-            List<Status> statuses = null;
-
-            try {
-                statuses = twitter.getHomeTimeline();
-            } catch (TwitterException e) {
-                e.printStackTrace();
-            }
-
-
-            Properties prop = new Properties();
-            InputStream input;
-            try {
-                input = new FileInputStream(dataPropPath);
-                prop.load(input);
-                input.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            long latestId = Long.parseLong(prop.getProperty("latestId"));
-
-            if (statuses != null) {
-                for (Status status : statuses) {
-                    long id = status.getId();
-                    if(id < latestId){
-                        continue;
-                    }
-                    latestId = id;
-                    String user = status.getUser().getName();
-                    String pubKey = SignAndVerify.getPubKey(user);
-                    String msg[] = status.getText().split("\\r?\\n");
-                    if(SignAndVerify.verifySign(pubKey,msg[0],msg[1])) nodePostData(node,msg[1]);
-                }
-            }
-            OutputStream output;
-            try {
-                output = new FileOutputStream(dataPropPath);
-                prop.setProperty("latestId",latestId+"");
-                prop.store(output,null);
-                output.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 
@@ -261,6 +236,91 @@ class TwitterInterface {
             }
             System.out.println("Tweet posted succesfully for "+user);
         }
+    }
+
+    static void fetchTweets(String user){
+
+        TwitterFactory tf = getTFname(user);
+        Twitter twitter;
+        if (tf != null) {
+            twitter = tf.getInstance();
+            List<Status> statuses = null;
+            long latestId =0;
+
+            try {
+                statuses = twitter.getHomeTimeline();
+            } catch (TwitterException e) {
+                e.printStackTrace();
+            }
+
+            Properties prop = new Properties();
+            InputStream input;
+            try {
+                input = new FileInputStream(dataPropPath);
+                prop.load(input);
+                input.close();
+                if (user=="master")
+                {
+                    latestId = Long.parseLong(prop.getProperty("masterId"));
+                }
+                else
+                {
+                    latestId = Long.parseLong(prop.getProperty("latestId"));
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            long id=latestId;
+            if (statuses != null) {
+                for (Status status : statuses) {
+                    id = status.getId();
+                    if (id < latestId) {
+                        continue;
+                    }
+                    if(user.equals("master")) {
+                        nodeTweetsConsensus(status);
+
+                    } else {
+                    String tweetUser = status.getUser().getName();
+                    String pubKey = SignAndVerify.getPubKey(tweetUser);
+                    String msg[] = status.getText().split("\\r?\\n");
+
+                    if (SignAndVerify.verifySign(pubKey, msg[0], msg[1])) nodePostData(user, msg[1]);
+                }
+                }
+            }
+            latestId = id;
+            OutputStream output;
+            try {
+                output = new FileOutputStream(dataPropPath);
+                if (user=="master")
+                {
+                    prop.setProperty("masterId",latestId+"");
+                }
+                else
+                {
+                    prop.setProperty("latestId",latestId+"");
+                }
+                prop.store(output,null);
+                output.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private static void nodeTweetsConsensus(Status status){
+        if(consensus.containsKey(status.getText()))
+        {
+            consensus.put(status.getText(), (consensus.get(status.getText())+1));
+        }else{
+            consensus.put(status.getText(),1);
+        }
+    }
+
+    static HashMap<String, Integer> getConsensus(){
+        return consensus;
     }
 
 
