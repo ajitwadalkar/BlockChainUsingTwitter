@@ -35,12 +35,11 @@ public class Users {
 
     public static void userGetData(String user) throws UnsupportedEncodingException, NoSuchAlgorithmException, TwitterException {
         TwitterFactory tf = null;
-        String pubKey = "";
+        String pubKey = SignAndVerify.getPubKey(user);
         switch(user)
         {
             case "user01":
                 tf = new TwitterFactory(user01ConfigBuilder.build());
-                pubKey = "046794F247C7D059582978BD02310243146F1D33F5E093";
                 break;
         }
         Twitter twitter = null;

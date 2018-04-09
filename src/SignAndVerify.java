@@ -51,18 +51,6 @@ public class SignAndVerify {
         BigInteger numHash = new BigInteger(1, thedigest);
         return  numHash;
     }
-/*
 
-   public static String getSignature(String user, String msg) throws IOException, NoSuchAlgorithmException {
-       Properties properties = new Properties();
-       InputStream pubKeys = null;
-       pubKeys = new FileInputStream("PublicKeys.properties");
-       properties.load(pubKeys);
-       BigInteger sk = getHash(user);
-       BigInteger hmsg = getHash(msg);
-
-       return "a";
-    }
-*/
 
 }
