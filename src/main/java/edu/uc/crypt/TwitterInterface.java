@@ -1,41 +1,57 @@
 package edu.uc.crypt;
+
 import twitter4j.Status;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
 import twitter4j.conf.ConfigurationBuilder;
-
 import java.io.*;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Properties;
-public class TwitterInterface {
+
+class TwitterInterface {
     //Users Config
-    static ConfigurationBuilder user01ConfigBuilder = new ConfigurationBuilder();
-    static ConfigurationBuilder user02ConfigBuilder = new ConfigurationBuilder();
-    static ConfigurationBuilder user03ConfigBuilder = new ConfigurationBuilder();
-    static ConfigurationBuilder user04ConfigBuilder = new ConfigurationBuilder();
-    static ConfigurationBuilder user05ConfigBuilder = new ConfigurationBuilder();
-    static ConfigurationBuilder user06ConfigBuilder = new ConfigurationBuilder();
+    private static ConfigurationBuilder user01ConfigBuilder = new ConfigurationBuilder();
+    private static ConfigurationBuilder user02ConfigBuilder = new ConfigurationBuilder();
+    private static ConfigurationBuilder user03ConfigBuilder = new ConfigurationBuilder();
+    private static ConfigurationBuilder user04ConfigBuilder = new ConfigurationBuilder();
+    private static ConfigurationBuilder user05ConfigBuilder = new ConfigurationBuilder();
+    private static ConfigurationBuilder user06ConfigBuilder = new ConfigurationBuilder();
 
     //Nodes Config
-    static ConfigurationBuilder node01ConfigBuilder = new ConfigurationBuilder();
-    static ConfigurationBuilder node02ConfigBuilder = new ConfigurationBuilder();
-    static ConfigurationBuilder node03ConfigBuilder = new ConfigurationBuilder();
-    static ConfigurationBuilder node04ConfigBuilder = new ConfigurationBuilder();
-    static ConfigurationBuilder node05ConfigBuilder = new ConfigurationBuilder();
-    static ConfigurationBuilder node06ConfigBuilder = new ConfigurationBuilder();
-    static ConfigurationBuilder node07ConfigBuilder = new ConfigurationBuilder();
+    private static ConfigurationBuilder node01ConfigBuilder = new ConfigurationBuilder();
+    private static ConfigurationBuilder node02ConfigBuilder = new ConfigurationBuilder();
+    private static ConfigurationBuilder node03ConfigBuilder = new ConfigurationBuilder();
+    private static ConfigurationBuilder node04ConfigBuilder = new ConfigurationBuilder();
+    private static ConfigurationBuilder node05ConfigBuilder = new ConfigurationBuilder();
+    private static ConfigurationBuilder node06ConfigBuilder = new ConfigurationBuilder();
+    private static ConfigurationBuilder node07ConfigBuilder = new ConfigurationBuilder();
 
-    //TweeterFactory
-    static TwitterFactory tfUser01;
-    static TwitterFactory tfUser02;
-    static TwitterFactory tfUser03;
-    static TwitterFactory tfUser04;
-    static TwitterFactory tfUser05;
-    static TwitterFactory tfUser06;
+    //TweeterFactory users
+    private static TwitterFactory tfUser01;
+    private static TwitterFactory tfUser02;
+    private static TwitterFactory tfUser03;
+    private static TwitterFactory tfUser04;
+    private static TwitterFactory tfUser05;
+    private static TwitterFactory tfUser06;
 
-    public static void TwitterInterface(){
+    //TweeterFactory nodes
+    private static TwitterFactory tfnode01;
+    private static TwitterFactory tfnode02;
+    private static TwitterFactory tfnode03;
+    private static TwitterFactory tfnode04;
+    private static TwitterFactory tfnode05;
+    private static TwitterFactory tfnode06;
+    private static TwitterFactory tfnode07;
+    private static String dataPropPath;
+
+    static void initialize(){
+        dataPropPath = ValidateTweets.class.getResource("data.properties").getPath();
+        setTokens();
+        buildTwitterFactory();
+    }
+
+    private static void setTokens(){
         user01ConfigBuilder.setDebugEnabled(true).setOAuthConsumerKey("unACzlI4DYiEaqhCwolADw810")
                 .setOAuthConsumerSecret("ruMdswNC3t3M5G9zxT0TjMo502NUBUwP5BsOXZ2jkHCroA0bs8")
                 .setOAuthAccessToken("979779756597174273-ILxdR8WKzn3CiLlrmKJ1NJbULW6VrX6")
@@ -100,11 +116,9 @@ public class TwitterInterface {
                 .setOAuthConsumerSecret("YN6xuNyGHr9bMoFgndLKQpF5NZAs0lJ9rLzIVcJLufiQaceImt")
                 .setOAuthAccessToken("981244873297801217-1IS8MhD4WiGf3HxdcdZUXIMx0KbuxBx")
                 .setOAuthAccessTokenSecret("0lcvCIOuhBMcSKv6Z1QmSien9T1iPoqC4uHYXzMNRdYMh");
-
-        buildTwitterFactory();
     }
 
-    public static void buildTwitterFactory(){
+    private static void buildTwitterFactory(){
         //TwitterFactory
         tfUser01 = new TwitterFactory(user01ConfigBuilder.build());
         tfUser02 = new TwitterFactory(user02ConfigBuilder.build());
@@ -112,12 +126,41 @@ public class TwitterInterface {
         tfUser04 = new TwitterFactory(user04ConfigBuilder.build());
         tfUser05 = new TwitterFactory(user05ConfigBuilder.build());
         tfUser06 = new TwitterFactory(user06ConfigBuilder.build());
+        tfnode01 = new TwitterFactory(node01ConfigBuilder.build());
+        tfnode02 = new TwitterFactory(node02ConfigBuilder.build());
+        tfnode03 = new TwitterFactory(node03ConfigBuilder.build());
+        tfnode04 = new TwitterFactory(node04ConfigBuilder.build());
+        tfnode05 = new TwitterFactory(node05ConfigBuilder.build());
+        tfnode06 = new TwitterFactory(node06ConfigBuilder.build());
+        tfnode07 = new TwitterFactory(node07ConfigBuilder.build());
+
     }
 
-    public static void userPostData(String user, String msg){
+    private static TwitterFactory getTFname(String name){
         TwitterFactory tf = null;
-        switch(user)
+        switch(name)
         {
+            case "node01":
+                tf = tfnode01;
+                break;
+            case "node02":
+                tf = tfnode02;
+                break;
+            case "node03":
+                tf = tfnode03;
+                break;
+            case "node04":
+                tf = tfnode04;
+                break;
+            case "node05":
+                tf = tfnode05;
+                break;
+            case "node06":
+                tf = tfnode06;
+                break;
+            case "node07":
+                tf = tfnode07;
+                break;
             case "user01":
                 tf = tfUser01;
                 break;
@@ -136,8 +179,14 @@ public class TwitterInterface {
             case "user06":
                 tf = tfUser06;
                 break;
+
         }
-        Twitter twitter = null;
+        return tf;
+    }
+
+    static void userPostData(String user, String msg){
+        TwitterFactory tf = getTFname(user);
+        Twitter twitter;
         if (tf != null) {
             twitter = tf.getInstance();
             try {
@@ -148,5 +197,71 @@ public class TwitterInterface {
             System.out.println("Tweet posted succesfully for "+user);
         }
     }
+
+    static void nodeGetData(String node){
+        TwitterFactory tf = getTFname(node);
+        Twitter twitter;
+        if (tf != null) {
+            twitter = tf.getInstance();
+            List<Status> statuses = null;
+
+            try {
+                statuses = twitter.getHomeTimeline();
+            } catch (TwitterException e) {
+                e.printStackTrace();
+            }
+
+
+            Properties prop = new Properties();
+            InputStream input;
+            try {
+                input = new FileInputStream(dataPropPath);
+                prop.load(input);
+                input.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            long latestId = Long.parseLong(prop.getProperty("latestId"));
+
+            if (statuses != null) {
+                for (Status status : statuses) {
+                    long id = status.getId();
+                    if(id < latestId){
+                        continue;
+                    }
+                    latestId = id;
+                    String user = status.getUser().getName();
+                    String pubKey = SignAndVerify.getPubKey(user);
+                    String msg[] = status.getText().split("\\r?\\n");
+                    if(SignAndVerify.verifySign(pubKey,msg[0],msg[1])) nodePostData(node,msg[1]);
+                }
+            }
+            OutputStream output;
+            try {
+                output = new FileOutputStream(dataPropPath);
+                prop.setProperty("latestId",latestId+"");
+                prop.store(output,null);
+                output.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private static void nodePostData(String user, String msg){
+        TwitterFactory tf = getTFname(user);
+        Twitter twitter;
+        if (tf != null) {
+            twitter = tf.getInstance();
+            try {
+                twitter.updateStatus(msg);
+            } catch (TwitterException e) {
+                e.printStackTrace();
+            }
+            System.out.println("Tweet posted succesfully for "+user);
+        }
+    }
+
 
 }
