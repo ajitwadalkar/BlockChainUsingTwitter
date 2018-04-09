@@ -35,7 +35,7 @@ public class Nodes {
             Properties prop = new Properties();
             InputStream input = null;
             try {
-                input = new FileInputStream("D:\\github\\BlockChainUsingTwitter\\src\\main\\resources\\edu\\uc\\crypt\\data.properties");
+                input = new FileInputStream("/home/phoenix/IdeaProjects/BlockChainV_01/src/main/resources/edu/uc/crypt/data.properties");
                 prop.load(input);
                 input.close();
             } catch (FileNotFoundException e) {
@@ -57,7 +57,7 @@ public class Nodes {
             }
             OutputStream output = null;
             try {
-                output = new FileOutputStream("D:\\github\\BlockChainUsingTwitter\\src\\main\\resources\\edu\\uc\\crypt\\data.properties");
+                output = new FileOutputStream("/home/phoenix/IdeaProjects/BlockChainV_01/src/main/resources/edu/uc/crypt/data.properties");
                 System.out.println(latestId);
                 prop.setProperty("latestId",latestId+"");
                 prop.store(output,null);

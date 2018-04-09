@@ -7,10 +7,11 @@ import java.security.NoSuchAlgorithmException;
 
 public class test {
     public static void main(String[] args) throws TwitterException, UnsupportedEncodingException, NoSuchAlgorithmException {
-        Users.Users();
+    //    Users.Users();
         Nodes.Nodes();
-//        Users.userPostData("node01","Another test Message");
+      //  Users.userPostData("user01","First Test Tweet");
 //        System.out.printf(System.getProperty("java.class.path"));
-        Nodes.nodeGetData("node01");
+//        Nodes.nodeGetData("node01");
+
     }
 }

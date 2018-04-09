@@ -12,7 +12,7 @@ public class SignAndVerify {
     private static BigInteger primeNum =  new BigInteger("1374228530234763472016406730030809440720634793537908797");
     private static BigInteger gVal = new BigInteger("2");
 
-    public static void main(String[] args) throws UnsupportedEncodingException, NoSuchAlgorithmException {
+    public static void main(String[] args){
 
 
         String msg = "This is a test message";
@@ -26,19 +26,19 @@ public class SignAndVerify {
 
     }
 
-    public static String signMsg(String secretKey, String msg) throws UnsupportedEncodingException, NoSuchAlgorithmException {
+    public static String signMsg(String secretKey, String msg){
         BigInteger sk = getHash(secretKey);
         BigInteger hmsg = getHash(msg);
         BigInteger sign = gVal.modPow(hmsg.subtract(sk), primeNum); //g raised to (hash msg - secret key) mod p
         return DatatypeConverter.printHexBinary(sign.toByteArray());
     }
 
-    public static String getPubKey(String secretKey) throws UnsupportedEncodingException, NoSuchAlgorithmException {
+    public static String getPubKey(String secretKey) {
         BigInteger sk = getHash(secretKey);
         return DatatypeConverter.printHexBinary(gVal.modPow(sk, primeNum).toByteArray());
     }
 
-    public static Boolean verifySign(String pubKey, String signature, String msg) throws UnsupportedEncodingException, NoSuchAlgorithmException {
+    public static Boolean verifySign(String pubKey, String signature, String msg){
         BigInteger sign = new BigInteger(1, DatatypeConverter.parseHexBinary(signature));
         BigInteger pk = new BigInteger(1, DatatypeConverter.parseHexBinary(pubKey));
         BigInteger hmsg = getHash(msg);
@@ -46,9 +46,19 @@ public class SignAndVerify {
         BigInteger sp = (sign.multiply(pk)).mod(primeNum);
         return gm.equals(sp);
     }
-    public static BigInteger getHash(String msg) throws NoSuchAlgorithmException, UnsupportedEncodingException {
-        byte[] bytesOfMessage = msg.getBytes("UTF-8");
-        MessageDigest md = MessageDigest.getInstance("MD5");
+    public static BigInteger getHash(String msg){
+        byte[] bytesOfMessage = new byte[0];
+        try {
+            bytesOfMessage = msg.getBytes("UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        MessageDigest md = null;
+        try {
+            md = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
         byte[] thedigest = md.digest(bytesOfMessage);
         BigInteger numHash = new BigInteger(1, thedigest);
         return  numHash;
