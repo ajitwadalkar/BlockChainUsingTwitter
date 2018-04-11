@@ -8,9 +8,9 @@ import java.util.Date;
 public class GenerateTweetsforUsers {
     public static void main(String[] args) {
         TwitterInterface.initialize();
-        generateTweets("user01");
-        generateTweets("user02");
-        generateTweets("user03");
+       // generateTweets("user01");
+       // generateTweets("user02");
+       generateTweets("user03");
         generateTweets("user04");
         generateTweets("user05");
         generateTweets("user06");
