@@ -8,9 +8,9 @@ import java.util.Date;
 public class GenerateTweetsforUsers {
     public static void main(String[] args) {
         TwitterInterface.initialize();
-       // generateTweets("user01");
-       // generateTweets("user02");
-       generateTweets("user03");
+        generateTweets("user01");
+        generateTweets("user02");
+        generateTweets("user03");
         generateTweets("user04");
         generateTweets("user05");
         generateTweets("user06");
@@ -22,7 +22,7 @@ public class GenerateTweetsforUsers {
             String msg = "Post time is: "+dateFormat.format(date);
             TwitterInterface.postTweets(user,msg);
             try {
-                Thread.sleep(800);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

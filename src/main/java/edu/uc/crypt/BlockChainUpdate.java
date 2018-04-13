@@ -9,7 +9,7 @@ public class BlockChainUpdate {
         TwitterInterface.initialize();
         TwitterInterface.fetchTweets("master");
         HashMap<String, Integer> consensus = TwitterInterface.getConsensus();
-        List<String> tweetsToPost=new ArrayList<String>();;
+        List<String> tweetsToPost=new ArrayList<String>();
         for(String s:consensus.keySet())
         {
             if(consensus.get(s)>=4)
