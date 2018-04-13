@@ -112,10 +112,10 @@ class TwitterInterface {
                 .setOAuthAccessToken("981208370035220480-SdZdz6Jg0ZB4tHkAyurrqbnKungfFqY")
                 .setOAuthAccessTokenSecret("5fow18UlgH0GWUtAjAB7bS6qxk5TZKRgVAvvgLpViKChH");
 
-        node04ConfigBuilder.setDebugEnabled(true).setOAuthConsumerKey("iQohw249pAkiIumXFXjKOZgfT")
-                .setOAuthConsumerSecret("J3vdGh6NaF3WAkBZjxIXZNql0Nn1uYdihYz9G3YhoO8uxk0tGv")
-                .setOAuthAccessToken("981208370035220480-Q9fWjtUe4DJs4612eGXjXvPDLq4JHrC")
-                .setOAuthAccessTokenSecret("ee8H0uQ36gcyBN5MUiVmhpEUFLUZM1KmwDrJ1ebg43UrN");
+        node04ConfigBuilder.setDebugEnabled(true).setOAuthConsumerKey("cIv5xY4RtN7RpYWOKW5ORrHgj")
+                .setOAuthConsumerSecret("UBxi6SrjMu69NDPmcwqBaa8Eoh7y03XjROYOFmjeWwNK7dMVhP")
+                .setOAuthAccessToken("981216442212372481-MO2Ja7IH4DKlDZ21QVGiWIS8xT7WLyc")
+                .setOAuthAccessTokenSecret("Fdj9aO5yB6P1d2OLFwgvoaRVcWdALKWsIoqmLgQgbnhPM");
 
         node05ConfigBuilder.setDebugEnabled(true).setOAuthConsumerKey("VSshGGOoFwsA9jnWdLabgeDAO")
                 .setOAuthConsumerSecret("eiRaokjSxxtP6y6J7jcR83toDx7WtlMjw4yaHRsTu1D3ZADWa2")
@@ -252,6 +252,7 @@ class TwitterInterface {
             Properties prop = new Properties();
             InputStream input;
             try {
+                System.out.println(dataPropPath);
                 input = new FileInputStream(dataPropPath);
                 prop.load(input);
                 input.close();
@@ -260,17 +261,24 @@ class TwitterInterface {
                 } else {
                     latestId = Long.parseLong(prop.getProperty(user+"latestId"));
                 }
+                System.out.println(latestId);
+
+
+
 
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            long id = latestId;
             if (statuses != null) {
+                long id = 0;
+                long temp = 0;
                 for (Status status : statuses) {
                     id = status.getId();
                     if (id < latestId) {
                         continue;
                     }
+                    if(id > temp)
+                        temp = id;
                     if (user.equals("master")) {
                         nodeTweetsConsensus(status);
 
@@ -279,11 +287,12 @@ class TwitterInterface {
                         String pubKey = SignAndVerify.getPubKey(tweetUser);
                         String msg[] = status.getText().split("\\r?\\n");
 
-                        if (SignAndVerify.verifySign(pubKey, msg[0], msg[1])) nodePostData(user, msg[1]);
+//                        if (msg.length > 1 && SignAndVerify.verifySign(pubKey, msg[0], msg[1])) nodePostData(user, msg[1]);
                     }
                 }
+                if(temp > latestId)
+                    latestId = temp;
             }
-            latestId = id;
             OutputStream output;
             try {
                 output = new FileOutputStream(dataPropPath);
@@ -292,6 +301,7 @@ class TwitterInterface {
                 } else {
                     prop.setProperty(user+"latestId", latestId + "");
                 }
+                System.out.println(dataPropPath);
                 prop.store(output, null);
                 output.close();
             } catch (IOException e) {
@@ -315,6 +325,7 @@ class TwitterInterface {
 
     static void getTweets(String user) {
         TwitterFactory tf = getTFname(user);
+
         Twitter twitter;
         if (tf != null) {
             twitter = tf.getInstance();
