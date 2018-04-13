@@ -5,20 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3ae08957-4081-4a00-8fcc-20825f4d83e7" name="Default" comment="">
-<<<<<<< HEAD
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/BlockChainV_01/edu/uc/crypt/BlockChainUpdate.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/BlockChainV_01/edu/uc/crypt/BlockChainUpdate.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/BlockChainV_01/edu/uc/crypt/TwitterInterface.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/BlockChainV_01/edu/uc/crypt/TwitterInterface.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/BlockChainV_01/edu/uc/crypt/data.properties" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/BlockChainV_01/edu/uc/crypt/data.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/BlockChainV_01/edu/uc/crypt/test.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/BlockChainV_01/edu/uc/crypt/test.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/edu/uc/crypt/test.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/edu/uc/crypt/test.java" afterDir="false" />
-=======
+
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change beforePath="$PROJECT_DIR$/src/main/java/edu/uc/crypt/TwitterInterface.java" afterPath="$PROJECT_DIR$/src/main/java/edu/uc/crypt/TwitterInterface.java" />
       <change beforePath="$PROJECT_DIR$/src/main/java/edu/uc/crypt/ValidateTweets.java" afterPath="$PROJECT_DIR$/src/main/java/edu/uc/crypt/ValidateTweets.java" />
       <change beforePath="$PROJECT_DIR$/src/main/java/edu/uc/crypt/test.java" afterPath="$PROJECT_DIR$/src/main/java/edu/uc/crypt/test.java" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/edu/uc/crypt/data.properties" afterPath="$PROJECT_DIR$/src/main/resources/edu/uc/crypt/data.properties" />
->>>>>>> 7f37a9ee058edc4a15402f34fc2dd0a3bcd1849a
+
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
